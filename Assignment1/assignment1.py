@@ -15,7 +15,7 @@ import csv
 import sys
 
 __author__ = "Dennis Scheper (373689)"
-__date__ = "17/05/2023"
+__date__ = "18/05/2023"
 __version__ = "v1.0"
 __contact__ = "d.j.scheper@st.hanze.nl"
 
