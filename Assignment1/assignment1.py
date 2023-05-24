@@ -19,9 +19,10 @@ __date__ = "18/05/2023"
 __version__ = "v1.0"
 __contact__ = "d.j.scheper@st.hanze.nl"
 
-def define_arguments() -> None:
+def define_arguments() -> ap.Namespace:
     """
     Defines arguments for command-line usage.
+    :return: argparser
     """
     argparser = ap.ArgumentParser(
         description="""Script voor Opdracht 1 van Big Data Computing.
@@ -39,21 +40,28 @@ def define_arguments() -> None:
     return argparser.parse_args()
 
 
-def calculate_phred(fastqfile: str) -> list:
+def calculate_phred(q_string: str) -> list:
     """
     Calculates the PHRED score for all characters in a read.
+    :param: quality string of a read
+    :return: the resulting list with PHRED scores 
     """
-    return [ord(q) - 33 for q in fastqfile]
+    return [ord(q) - 33 for q in q_string]
 
 
-def write_csv(csvfile, results: list, name, multiple_files: bool) -> None:
+def write_csv(csvfile: str, results: list) -> int:
     """
     Writes results to a csv file per given FASTQ file.
-    Name of resulting csv file will be formatted as if there are multiple FastQ files:
+    Name of resulting csv file will be formatted differently if there are multiple FastQ files:
         `[name of inputfile].[name of outputfile].csv`
+    Otherwise, the resulting csv will bear the name given by the user.
+    :param: csvfile csvfile name
+    :param: results PHRED score list
+    :param: name name of inputfile
+    :param: multiple_files whether more than one inputfile was given
+    :return: 0
     """
     header = ['base_nr', 'average_phred_score']
-    csvfile = f"{str(name.name)}.{str(csvfile.name)}" if multiple_files else csvfile.name
     with open(csvfile, 'w', newline="", encoding='utf-8') as csv_output:
         csvwriter = csv.writer(csv_output)
         csvwriter.writerow(i for i in header)
@@ -61,8 +69,10 @@ def write_csv(csvfile, results: list, name, multiple_files: bool) -> None:
         for base_nmr, av_phred in enumerate(results, start=1):
             csvwriter.writerow([base_nmr, av_phred])
 
+    return 0
 
-def main():
+
+def main() -> int:
     """
     Main function in which command-line arguments are parsed and functions executed.
     """
@@ -72,25 +82,28 @@ def main():
         try:
             with open(file.name, 'r', encoding='utf-8') as inputfile:
                 lines = inputfile.read().splitlines() # remove \n
+                print(lines[3::4])
         except FileNotFoundError:
             print(f"Couldn't find {inputfile}")
         except IOError as error:
             print(f"An error occured while trying to open {inputfile}. The error: {str(error)}")
 
-        with mp.Pool(args.n) as pool:
-            results = pool.map(calculate_phred, lines[3::4]) # only take the fourth line of read
+        with mp.Pool(processes=args.n) as pool:
+            # only take the fourth line of read
+            results = pool.map(calculate_phred, lines[3::4])
 
         average = np.mean(results, axis=0)
 
         if args.csvfile is not None:
-            check_multiple = len(args.fastq_files)>1
-            write_csv(args.csvfile, average, file,
-                      multiple_files=check_multiple)
+            csvfile = f"{str(file.name)}.{str(csvfile.name)}" if len(args.fastq_files)>1 else csvfile.name
+            write_csv(csvfile, average)
         else:
             print(f"Results for {file.name}")
             csv_writer = csv.writer(sys.stdout)
             for index, row in enumerate(average, start=1):
                 csv_writer.writerow([index, row])
 
+    return 0
+
 if __name__ == "__main__":
-    main()
+    sys.exit(main())
