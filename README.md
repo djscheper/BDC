@@ -5,7 +5,7 @@ E-mail: d.j.scheper@st.hanze.nl
 
 Assignments:
 - `Assignment1`: Calculate the average Phred score per base position using Python's multiprocessing package with `Pool.map()`.
-- `Assignment2`
+- `Assignment2`: Calculate the average Phred score per base position, implemented over a network of computers.
 - `Assignment3`
 - `Assignment4`
 - `Assignment5`
