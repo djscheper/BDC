@@ -1,9 +1,3 @@
-import os
-from collections import defaultdict
-import numpy as np
-import csv
-import multiprocessing as mp
-
 class PhredScoreCalculator:
     """
     Class used to handle the processing of a FastQ file to Phred scores.
@@ -11,7 +5,7 @@ class PhredScoreCalculator:
     Functions:
     - make_chuncks: splits FastQ file into chuncks in bytes based on the amount of cores
     - get_chuncks: simply retrieve all chuncks
-    - process_not None:file: this function calculates the Phred score per base position per chunck
+    - process_file: this function calculates the Phred score per base position per chunck
     - calculate_average: calculates the average Phred score per base position by concatenating
                          all chuncks into defaultdict
     - write_csv: used for writing the results to a CSV format
@@ -27,7 +21,6 @@ class PhredScoreCalculator:
 
         self.chuncks: holds the chuncks defined by the make_chuncks function
         """
-        print(fastq)
         self.fastq = fastq.name
         self.n = n
         self.chuncks = []
@@ -129,29 +122,3 @@ class PhredScoreCalculator:
             writer = csv.writer(csv_file)
             for key, value in phred_scores.items():
                 writer.writerow([key, value])
- 
-
-def main():
-    """
-    Main function of the script. Is responsible for defining the multiprocessing pool,
-    using the class and its functions to guide the process of processing FASTQ files to calculate 
-    and output phred quality score averages.
-
-    Output:
-        - if csvfile is asked, write the results to an output csv file
-        - otherwise, simply print the results to the console
-    """
-    args = parse_arguments()
-
-    for file in args.fastq_files:
-        calculator = PhredScoreCalculator(file, args.n)
-        calculator.make_chuncks()
-        with mp.Pool(args.n) as pool:
-            results = pool.map(calculator.process_file, calculator.get_chunks())
-        averages = calculator.calculate_average(results)
-        if args.csvfile:
-            multiple = len(args.fastq_files)>1 # check for naming output files
-            calculator.csv_writer(averages, outputfile=args.csvfile, multiple=multiple)
-        else:
-            for key, value in averages.items():
-                print(f"{key}, {value}")
