@@ -113,7 +113,7 @@ def runserver(port, host, file, n_chuncks, outputfile):
     print("[Status] Time to kill some peons!")
     shared_job_q.put(POISONPILL)
 
-    time.sleep(5)
+    time.sleep(20)
     print("[Status] Shutting down the server...")
 
     manager.shutdown()
@@ -153,7 +153,7 @@ def runclient(num_processes, host, port):
     Runs the client and processes the given file by
     running some peons (workers).
     """
-    manager = make_client_manager(port, b"somesecretkey", host)
+    manager = make_client_manager(port, b'somesecretkey', host)
     job_q = manager.get_job_q()
     result_q = manager.get_result_q()
     run_workers(job_q, result_q, num_processes)
@@ -185,19 +185,21 @@ def peon(job_q, result_q):
     while True:
         try:
             job = job_q.get_nowait()
+            print(job)
             if job == POISONPILL:
+                print('done')
                 job_q.put(POISONPILL)
                 print(f"[Status] Killing: {my_name}")
                 return
             else:
                 try:
                     result = job['fn'](job['arg'])
-                    print(f"[Status] Peon f{my_name} is working on: {job['arg']}")
+                    print(f"[Status] Peon {my_name} is workin   g on: {job['arg']}")
                     result_q.put({'job': job, 'result': result})
                 except NameError:
                     print(f"[ERROR] We cannot find {my_name} anywhere...")
                     result_q.put({'job': job, 'result': "No results!"})
-        except queue.Empty:
+        except queue.Empty or EOFError:
             print(f"Closing {my_name}")
             time.sleep(5)
 

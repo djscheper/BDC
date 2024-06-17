@@ -1,3 +1,10 @@
+import argparse as ap
+import csv
+import multiprocessing as mp
+import os
+from collections import defaultdict
+import numpy as np 
+
 class PhredScoreCalculator:
     """
     Class used to handle the processing of a FastQ file to Phred scores.
