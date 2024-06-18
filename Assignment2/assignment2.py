@@ -23,6 +23,7 @@ import multiprocessing as mp
 from multiprocessing.managers import BaseManager
 import argparse as ap
 from phred import PhredScoreCalculator
+import os
 
 POISONPILL = "Grim Reaper"
 
