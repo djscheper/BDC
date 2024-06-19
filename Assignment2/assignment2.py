@@ -17,13 +17,13 @@ __version__ = "v1.0"
 __date__ = "30/05/2024"
 __contact__ = "d.j.scheper@st.hanze.nl"
 
+import os
 import time
 import queue
 import multiprocessing as mp
 from multiprocessing.managers import BaseManager
 import argparse as ap
 from phred import PhredScoreCalculator
-import os
 
 POISONPILL = "Grim Reaper"
 
@@ -200,12 +200,13 @@ def peon(job_q, result_q):
                 except NameError:
                     print(f"[ERROR] We cannot find {my_name} anywhere...")
                     result_q.put({'job': job, 'result': "No results!"})
-        except queue.Empty or EOFError:
+        except queue.Empty:
             print(f"Closing {my_name}")
             time.sleep(5)
 
 
 if __name__ == "__main__":
+    print(os.name)
     args = parse_arguments()
 
     if args.s and not args.chunks:
