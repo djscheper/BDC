@@ -114,7 +114,7 @@ def runserver(port, host, file, n_chuncks, outputfile):
     print("[Status] Time to kill some peons!")
     shared_job_q.put(POISONPILL)
 
-    time.sleep(20)
+    time.sleep(10)
     print("[Status] Shutting down the server...")
 
     manager.shutdown()
