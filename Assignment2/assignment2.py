@@ -63,7 +63,6 @@ def make_server_manager(port, authkey, host):
         """
         Encodes for the queue responsible for chunck processing.
         """
-        pass
 
     QueueManager.register('get_job_q', callable=lambda: job_q)
     QueueManager.register('get_result_q', callable=lambda: result_q)
@@ -82,7 +81,7 @@ def runserver(port, host, file, n_chuncks, outputfile):
 
     Returns nothing.
     """
-    manager = make_server_manager(port, b'somesecretkey', host)
+    manager = make_server_manager(port, b"somesecretkey", host)
     shared_job_q = manager.get_job_q()
     shared_result_q = manager.get_result_q()
 
@@ -137,7 +136,6 @@ def make_client_manager(port, authkey, host):
         """
         Encodes for the queue responsible for chunck processing.
         """
-        pass
 
     ServerQueueManager.register('get_job_q')
     ServerQueueManager.register('get_result_q')
@@ -154,7 +152,7 @@ def runclient(num_processes, host, port):
     Runs the client and processes the given file by
     running some peons (workers).
     """
-    manager = make_client_manager(port, b'somesecretkey', host)
+    manager = make_client_manager(port, b"somesecretkey", host)
     job_q = manager.get_job_q()
     result_q = manager.get_result_q()
     run_workers(job_q, result_q, num_processes)
@@ -206,8 +204,11 @@ def peon(job_q, result_q):
 
 
 if __name__ == "__main__":
-    print(os.name)
     args = parse_arguments()
+
+    # Check since I got an error
+    if os.path.exists(args.fastq_files):
+        print(f'File {args.fastq_files} exists!')
 
     if args.s and not args.chunks:
         print("--chunks is required when running in server mode")
