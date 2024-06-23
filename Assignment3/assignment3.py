@@ -62,6 +62,7 @@ def process_qline():
                 for pos, quality in enumerate(qual):
                     phred_scores[pos].append(quality - 33)
 
+    # use json since a normal dict or defaultdict would take very long
     print(json.dumps(dict(phred_scores)))
 
 
