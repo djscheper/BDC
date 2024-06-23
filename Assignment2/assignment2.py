@@ -205,10 +205,7 @@ def peon(job_q, result_q):
 
 if __name__ == "__main__":
     args = parse_arguments()
-
-    # Check since I got an error
-    if os.path.exists(args.fastq_files):
-        print(f'File {args.fastq_files} exists!')
+    print(os.name)
 
     if args.s and not args.chunks:
         print("--chunks is required when running in server mode")
