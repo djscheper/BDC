@@ -14,11 +14,10 @@ Usage:
 
 from collections import defaultdict
 import argparse as ap
+import csv
+import ast
 import sys
 import numpy as np
-import csv
-import json
-import time
 
 __author__ = "Dennis Scheper (373689)"
 __status__ = "Work in progress..."
@@ -37,6 +36,7 @@ def parse_arguments():
     parser.add_argument("-o", action="store", dest="csvfile", required=False, help="CSV file om de output in op te slaan. Default is output naar terminal STDOUT")
     parser.add_argument("-n", type=int, required=False)
     return parser.parse_args()
+
 
 def process_qline():
     """
@@ -61,9 +61,8 @@ def process_qline():
                 qual = line.strip()
                 for pos, quality in enumerate(qual):
                     phred_scores[pos].append(quality - 33)
-
-    # use json since a normal dict or defaultdict would take very long
-    print(json.dumps(dict(phred_scores)))
+    # calculate the average per base position in place (for chunk)
+    print({key: np.mean(values) for key, values in phred_scores.items()})
 
 
 def calculate_average(filename, *, outputfile="output.csv", multiple=False):
@@ -79,26 +78,28 @@ def calculate_average(filename, *, outputfile="output.csv", multiple=False):
     Returns:
       X
     """
-    # receive the printed json from the process_qline function
-    phred_scores = json.loads(sys.stdin.read().strip())
-    combined = defaultdict(list)
+    data = sys.stdin.read().strip().split("\n")
+    #put back to a dict
+    result = [ast.literal_eval(res) for res in data]
+    combined_values = defaultdict(list)
 
-    for key, value in phred_scores.items():
-        combined[key].extend(value)
-
-    #calculate the averages per base position
-    averages = {key: np.mean(values) for key, values in phred_scores.items()}
+    # combine into one defaultdict
+    for dictonary in result:
+      for key, value in dictonary.items():
+          combined_values[key].append(value)
+    
+    # calculate the averages for the whole file
+    averages = {key: np.mean(values) for key, values in combined_values.items()}
 
     name_output = outputfile if not multiple else f"{filename}.{outputfile}"
     if filename is not None:
-        with open(name_output, 'w', newline='', encoding='UTF-8') as csv_file:
+        with open(name_output, 'w', encoding='UTF-8') as csv_file:
             writer = csv.writer(csv_file)
             for key, value in averages.items():
                 writer.writerow([key, value])
     else: 
         for key, value in averages.items():
             print(f"{key}, {value}")
-
 
 def main():
     """
