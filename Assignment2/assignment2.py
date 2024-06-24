@@ -211,8 +211,8 @@ if __name__ == "__main__":
         print("--chunks is required when running in server mode")
 
     if args.s:
-        args.o = None if not hasattr(args, 'o') else args.o
-        server = mp.Process(target=runserver, args=(args.port, args.host, args.fastq_files, args.chunks, args.o))
+        args.csvfile = None if not hasattr(args, 'csvfile') else args.csvfile
+        server = mp.Process(target=runserver, args=(args.port, args.host, args.fastq_files, args.chunks, args.csvfile))
         server.start()
         time.sleep(1)
 
