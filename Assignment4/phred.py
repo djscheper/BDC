@@ -82,11 +82,15 @@ class PhredScoreCalculator:
             chunk = inputfile.read(end-start)
         
         lines = chunk.split(b"\n")
+        line_num = 0
         num_dict = defaultdict(list)
         for line in lines:
-            qual = [c - 33 for c in line.strip()]
-            for pos, score in enumerate(qual):
-                num_dict[pos].append(score)
+            line_num += 1
+            if line_num % 4 == 0:
+                print(line)
+                qual = [c - 33 for c in line.strip()]
+                for pos, score in enumerate(qual):
+                    num_dict[pos].append(score)
         
         return num_dict
 
