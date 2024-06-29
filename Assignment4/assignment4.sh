@@ -17,7 +17,7 @@
 ##
 
 if [ -z "$1" ]; then 
-   export INPUT_FILES="/commons/Themas/Thema12/HPC/rnaseq_selection.fastq"
+   export INPUT_FILES="/commons/Themas/Thema12/HPC/rnaseq.fastq"
 else 
    export INPUT_FILES=("$@")
 fi
@@ -26,4 +26,4 @@ export WORK_DIR=$(realpath "$(dirname "$0")")
 
 source /commons/conda/conda_load.sh
 
-mpiexec -n 5 python3 assignment4.py "${INPUT_FILES}"
+mpirun -np 5 python3 assignment4.py "${INPUT_FILES}"

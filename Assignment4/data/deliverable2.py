@@ -13,6 +13,8 @@ Usage:
 """
 
 import argparse as ap
+import time
+from collections import defaultdict
 
 import numpy as np
 from mpi4py import MPI
@@ -32,6 +34,7 @@ def main():
     """
     Main function - calls upon all other functions.
     """
+    start = time.time()
     args = parse_arguments()
 
     comm = MPI.COMM_WORLD
@@ -41,11 +44,11 @@ def main():
     calculator = PhredScoreCalculator(args.fastq_files[0], amount_processes)
 
     if rank == 0:
-        calculator.make_chuncks()
-        chunks = calculator.get_chunks()
-        array_chunks = np.array_split(chunks, amount_processes)
+      calculator.make_chuncks()
+      chunks = calculator.get_chunks()
+      array_chunks = np.array_split(chunks, amount_processes)
     else:
-        array_chunks = None
+      array_chunks = None
 
     scatter_chunks = comm.scatter(array_chunks, root=0)
     res = [calculator.process_chunck(chunk) for chunk in scatter_chunks]
@@ -54,9 +57,11 @@ def main():
 
     if rank == 0:
         averages = calculator.calculate_average(all_processed_chunks)
-
-        for pos, score in averages.items():
-            print(f"{pos},{score}")
+        calculator.csv_writer(averages, outputfile=args.csvfile)
+        end = time.time()
+        run_time = end - start
+        print(run_time)
+            
 
 if __name__ == "__main__":
     main()

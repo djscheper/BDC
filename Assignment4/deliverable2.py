@@ -6,13 +6,14 @@ Big Data Computing (BDC) assignment 4.
 By Dennis Scheper (373689)
 
 FIRST:
-    chmod +x assignment3.sh
+    chmod +x deliverable2.sh
 
 Usage:
-    ./assignment3.sh [inputfiles]
+    ./deliverable2.sh [inputfiles]
 """
 
 import argparse as ap
+import time
 
 import numpy as np
 from mpi4py import MPI
@@ -28,10 +29,12 @@ def parse_arguments():
     parser.add_argument("-o", dest="csvfile", required=False, help="CSV file to store the output. Default is output to terminal STDOUT")
     return parser.parse_args()
 
+
 def main():
     """
     Main function - calls upon all other functions.
     """
+    start = time.time()
     args = parse_arguments()
 
     comm = MPI.COMM_WORLD
@@ -54,9 +57,11 @@ def main():
 
     if rank == 0:
         averages = calculator.calculate_average(all_processed_chunks)
+        calculator.csv_writer(averages, outputfile=args.csvfile)
+        end = time.time()
+        run_time = end - start
+        print(run_time)
 
-        for pos, score in averages.items():
-            print(f"{pos},{score}")
 
 if __name__ == "__main__":
     main()

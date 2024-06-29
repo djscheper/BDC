@@ -12,7 +12,9 @@ __status__ = "Work in progress..."
 __date__ = "17/05/2024"
 __contact__ = "d.j.scheper@st.hanze.nl"
 
+import argparse as ap
 import csv
+import multiprocessing as mp
 import os
 from collections import defaultdict
 import numpy as np
@@ -129,7 +131,7 @@ class PhredScoreCalculator:
         """
         filename = os.path.basename(self.fastq) # get name of fastq file
         name_output = outputfile if not multiple else f"{filename}.{outputfile}.csv"
-        with open(name_output.name, 'w', newline='', encoding='UTF-8') as csv_file:
+        with open(name_output, 'w', newline='', encoding='UTF-8') as csv_file:
             writer = csv.writer(csv_file)
             for key, value in phred_scores.items():
                 writer.writerow([key, value])
