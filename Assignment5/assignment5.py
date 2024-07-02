@@ -123,7 +123,7 @@ def main():
         }
         answers_df = pd.DataFrame([answers])
 
-        output_file = args.csvfile if args.csvfile != 'True' else 'output.csv'
+        output_file = args.csvfile if args.csvfile is not None else 'output.csv'
         answers_df.to_csv(output_file, index=False)
 
 if __name__ == "__main__":
